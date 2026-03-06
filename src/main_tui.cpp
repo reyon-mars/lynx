@@ -2,7 +2,7 @@
 #include "net/connection_stats.hpp"
 #include "net/net_except.hpp"
 #include "net/socket.hpp"
-#include "ui/term.hpp"
+#include "ui/term_context.hpp"
 #include "ui/terminal_ui.hpp"
 #include "utils/logger.hpp"
 #include "utils/thread_pool.hpp"
