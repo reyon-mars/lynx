@@ -10,6 +10,7 @@ FetchContent_MakeAvailable(Catch2)
 
 add_executable(unit_tests
     utils/test_string_utils.cpp
+    http/test_http_parser.cpp
 )
 
 target_link_libraries(unit_tests PRIVATE core Catch2::Catch2WithMain)

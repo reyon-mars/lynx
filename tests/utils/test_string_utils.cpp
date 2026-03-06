@@ -45,7 +45,7 @@ TEST_CASE("Split once (Key-Value parsing )", "[utils][string]")
 {
 	SECTION("Standard Header")
 	{
-		auto [key, value] = utils::split_once("Content-Type: text/html", ": ");
+		auto [key, value] = utils::split_once("Content-Type: text/html", ": ").value();
 		REQUIRE(key == "Content-Type");
 		REQUIRE(value == "text/html");
 	}
@@ -53,7 +53,7 @@ TEST_CASE("Split once (Key-Value parsing )", "[utils][string]")
 	SECTION("Port numbers in Host headers")
 	{
 		// Should only split at the first colon
-		auto [key, value] = utils::split_once("Host: localhost:8080", ": ");
+		auto [key, value] = utils::split_once("Host: localhost:8080", ": ").value();
 		REQUIRE(key == "Host");
 		REQUIRE(value == "localhost:8080");
 	}
