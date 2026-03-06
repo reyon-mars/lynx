@@ -48,8 +48,22 @@ namespace http
 
 	void http_request::set_body(std::string_view body)
 	{
+		if (body_.capacity() < body.size())
+		{
+			body_.reserve(body.size());
+		}
 		auto view = std::as_bytes(std::span(body));
 		body_.assign(view.begin(), view.end());
+		add_header("Content-Length", std::to_string(body_.size()));
+	}
+
+	void http_request::set_body(std::span<const std::byte> body)
+	{
+		if (body_.capacity() < body.size())
+		{
+			body_.reserve(body.size());
+		}
+		body_.assign(body.begin(), body.end());
 		add_header("Content-Length", std::to_string(body_.size()));
 	}
 

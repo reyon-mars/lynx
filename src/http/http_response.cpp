@@ -1,4 +1,5 @@
 #include "http/http_response.hpp"
+#include "http/http_types.hpp"
 #include "utils/string_utils.hpp"
 #include <cstddef>
 #include <cstring>
