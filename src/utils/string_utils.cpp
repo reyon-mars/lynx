@@ -36,11 +36,18 @@ namespace utils
 		return result;
 	}
 
-	[[nodiscard]] std::vector<std::string> split(std::string_view str, char delimeter)
+	[[nodiscard]] std::vector<std::string> split(std::string_view str, std::string_view delimeter)
 	{
 		std::vector<std::string> result;
+
 		if (str.empty())
 		{
+			return result;
+		}
+
+		if (delimeter.empty())
+		{
+			result.emplace_back(str);
 			return result;
 		}
 
@@ -54,7 +61,7 @@ namespace utils
 			{
 				result.emplace_back(segment);
 			}
-			start = end + 1;
+			start = end + delimeter.size();
 			end = str.find(delimeter, start);
 		}
 		std::string_view last_segment = str.substr(start, end);
@@ -97,10 +104,11 @@ namespace utils
 			if (c == '%' && (i + 2) < str.size())
 			{
 				int value{};
-				auto [ptr, ec] = std::from_chars(str.data() + i, str.data() + i + 3, value, 16);
+				auto [ptr, ec] = std::from_chars(str.data() + i + 1, str.data() + i + 3, value, 16);
 				if (ec == std::errc())
 				{
 					decoded.push_back(static_cast<char>(value));
+					i += 2;
 					continue;
 				}
 			}
@@ -142,5 +150,20 @@ namespace utils
 			}
 		}
 		return encoded;
+	}
+
+	std::pair<std::string_view, std::string_view> split_once(std::string_view str, std::string_view delimeter)
+	{
+		if (str.empty() || delimeter.empty())
+		{
+			return {str, {}};
+		}
+
+		size_t pos = str.find(delimeter);
+		if (pos != std::string_view::npos)
+		{
+			return {str.substr(0, pos), str.substr(pos + delimeter.size())};
+		}
+		return {str, {}};
 	}
 } // namespace utils
