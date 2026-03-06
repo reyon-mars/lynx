@@ -1,4 +1,6 @@
 #include "http/http_response.hpp"
+#include "utils/string_utils.hpp"
+#include <algorithm>
 #include <cstddef>
 #include <cstring>
 #include <map>
@@ -30,28 +32,48 @@ namespace http
 		return (it != reasons.end()) ? it->second : "Unknown";
 	}
 
-	void http_response::set_status_code(int status_code)
+	void http_response::set_status(int status_code)
 	{
-		status_code_ = status_code;
-		reason_phrase_.assign(get_reason_phrase(status_code));
+		status_line_.status_code_ = status_code;
+		status_line_.reason_phrase_.assign(get_reason_phrase(status_code));
 	}
 
-	void http_response::set_header(std::string name, std::string value)
+	int http_response::status_code() const
 	{
-		std::ranges::transform(name,
-							   name.begin(),
-							   [](unsigned char c)
-							   {
-								   return static_cast<char>(std::tolower(c));
-							   });
-
-		headers_.insert_or_assign(std::move(name), std::move(value));
+		return status_line_.status_code_;
 	}
 
-	void http_response::set_body(std::string body)
+	std::string_view http_response::reason_phrase() const
+	{
+		return status_line_.reason_phrase_;
+	}
+
+	void http_response::set_header(std::string_view name, std::string value)
+	{
+		std::string normalized_name = utils::to_lower(name);
+
+		headers_.insert_or_assign(std::move(normalized_name), std::move(value));
+	}
+
+	void http_response::remove_header(std::string_view name)
+	{
+		std::string normalized_name = utils::to_lower(name);
+
+		headers_.erase(normalized_name);
+	}
+
+	bool http_response::has_header(std::string_view name) const
+	{
+		std::string normalized_name = utils::to_lower(name);
+		return headers_.contains(normalized_name);
+	}
+
+	void http_response::set_body(std::string_view body)
 	{
 		auto view = std::as_bytes(std::span(body));
 		body_.assign(view.begin(), view.end());
+		set_header("Content-Length", std::to_string(body_.size()));
+		
 	}
 
 	void http_response::set_body(std::vector<std::byte> body)
@@ -62,7 +84,8 @@ namespace http
 	std::vector<std::byte> http_response::serialize()
 	{
 		std::ostringstream ss;
-		ss << version_ << " " << status_code_ << " " << reason_phrase_ << " " << "\r\n";
+		ss << status_line_.version_ << " " << status_line_.status_code_ << " " << status_line_.reason_phrase_ << " "
+		   << "\r\n";
 
 		for (const auto& [name, value] : headers_)
 		{
