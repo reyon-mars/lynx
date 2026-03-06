@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(http_server VERSION 1.0 LANGUAGES CXX)
+project(lynx VERSION 1.0 LANGUAGES CXX)
 
 # --------------------------------------------------
 # Global Configuration
