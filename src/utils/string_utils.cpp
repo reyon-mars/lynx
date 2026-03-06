@@ -85,4 +85,62 @@ namespace utils
 		}
 		return std::nullopt;
 	}
+
+	std::string url_decode(std::string_view str)
+	{
+		std::string decoded;
+		decoded.reserve(str.size());
+
+		for (size_t i = 0; i < str.size(); i++)
+		{
+			const char c = str[i];
+			if (c == '%' && (i + 2) < str.size())
+			{
+				int value{};
+				auto [ptr, ec] = std::from_chars(str.data() + i, str.data() + i + 3, value, 16);
+				if (ec == std::errc())
+				{
+					decoded.push_back(static_cast<char>(value));
+					continue;
+				}
+			}
+			if (c == '+')
+			{
+				decoded.push_back(' ');
+			}
+			else
+			{
+				decoded.push_back(c);
+			}
+		}
+		return decoded;
+	}
+
+	std::string url_encode(std::string_view str)
+	{
+		std::string encoded;
+		encoded.reserve(str.size() * 2);
+
+		auto is_safe = [](unsigned char c)
+		{
+			return std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~';
+		};
+
+		std::string_view hex = "0123456789ABCDEF";
+
+		for (const unsigned char c : str)
+		{
+			if (is_safe(c))
+			{
+				encoded.push_back(static_cast<char>(c));
+			}
+			else
+			{
+				encoded.push_back('%');
+				encoded.push_back(hex[c >> 4]);
+				encoded.push_back(hex[c & 0xF]);
+			}
+		}
+		return encoded;
+	}
 } // namespace utils
