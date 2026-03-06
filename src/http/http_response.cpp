@@ -1,4 +1,5 @@
 #include "http/http_response.hpp"
+#include "http/http_types.hpp"
 #include "utils/string_utils.hpp"
 #include <algorithm>
 #include <cstddef>
@@ -73,12 +74,13 @@ namespace http
 		auto view = std::as_bytes(std::span(body));
 		body_.assign(view.begin(), view.end());
 		set_header("Content-Length", std::to_string(body_.size()));
-		
+
 	}
 
-	void http_response::set_body(std::vector<std::byte> body)
+	void http_response::set_body(http_body body)
 	{
 		body_ = std::move(body);
+		set_header("Content-Length", std::to_string( body_.size()));
 	}
 
 	std::vector<std::byte> http_response::serialize()
