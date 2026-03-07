@@ -38,6 +38,7 @@ namespace http
 		const std::vector<std::byte>& body() const;
 
 		bool has_body() const;
+		bool has_valid_method() const;
 		size_t content_length() const;
 	};
 } // namespace http

@@ -8,6 +8,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -106,6 +107,13 @@ namespace http
 	bool http_request::has_body() const
 	{
 		return !body_.empty();
+	}
+
+	bool http_request::has_valid_method() const
+	{
+		static const std::unordered_set<std::string_view>
+			valid_methods{"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"};
+		return valid_methods.contains(request_line_.method_);
 	}
 
 	size_t http_request::content_length() const
