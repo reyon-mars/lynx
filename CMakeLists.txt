@@ -30,6 +30,10 @@ add_library(core STATIC
     src/net/socket_address.cpp
     src/utils/logger.cpp
     src/utils/thread_pool.cpp
+    src/utils/string_utils.cpp
+    src/http/http_request.cpp
+    src/http/http_response.cpp
+    src/http/http_parser.cpp
 )
 
 # Add project-level include directory
@@ -60,7 +64,7 @@ endif()
 
 if(BUILD_TUI)
 
-    add_executable(mirror_stream_tui
+    add_executable(lynx_server
         src/ui/input_handler.cpp
         src/ui/menu_renderer.cpp
         src/ui/terminal_ui.cpp
@@ -68,16 +72,16 @@ if(BUILD_TUI)
     )
 
     # GUI and TUI both need project include
-    target_include_directories(mirror_stream_tui
+    target_include_directories(lynx_server
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
     )
 
-    target_link_libraries(mirror_stream_tui
+    target_link_libraries(lynx_server
         PRIVATE core
     )
 
-    install(TARGETS mirror_stream_tui DESTINATION bin)
+    install(TARGETS lynx_server DESTINATION bin)
 
 endif()
 
@@ -89,7 +93,7 @@ if(BUILD_GUI)
 
     find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
-    add_executable(mirror_stream_gui
+    add_executable(lynx_gui
         # GUI source files
         src/gui/server_controller.cpp
         src/gui/config_widget.cpp
@@ -103,18 +107,22 @@ if(BUILD_GUI)
     )
 
     # Ensure project-level includes are visible
-    target_include_directories(mirror_stream_gui
+    target_include_directories(lynx_gui
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
     )
 
     # Link core and Qt
-    target_link_libraries(mirror_stream_gui
+    target_link_libraries(lynx_gui
         PRIVATE
         core
         Qt6::Widgets
     )
 
-    install(TARGETS mirror_stream_gui DESTINATION bin)
+    install(TARGETS lynx_gui DESTINATION bin)
 
 endif()
+
+
+enable_testing()
+add_subdirectory(tests)
