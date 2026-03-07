@@ -97,7 +97,7 @@ namespace ui
 
 	void terminal_ui::run(net::socket_config& cfg)
 	{
-		std::cout << color::set_cyan("=== Mirror Stream Terminal ===\n");
+		std::cout << color::set_cyan("=== Lynx Terminal ===\n");
 
 		cfg = config_menu();
 
