@@ -137,17 +137,18 @@ namespace utils
 
 		std::string_view hex = "0123456789ABCDEF";
 
-		for (const unsigned char c : str)
+		for (const auto c : str)
 		{
-			if (is_safe(c))
+			const auto unsigned_c = static_cast<unsigned char>(c);
+			if (is_safe(unsigned_c))
 			{
-				encoded.push_back(static_cast<char>(c));
+				encoded.push_back(c);
 			}
 			else
 			{
 				encoded.push_back('%');
-				encoded.push_back(hex[c >> 4]);
-				encoded.push_back(hex[c & 0xF]);
+				encoded.push_back(hex[unsigned_c >> 4]);
+				encoded.push_back(hex[unsigned_c & 0xF]);
 			}
 		}
 		return encoded;
