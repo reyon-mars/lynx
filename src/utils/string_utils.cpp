@@ -8,6 +8,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 namespace utils
@@ -152,18 +153,19 @@ namespace utils
 		return encoded;
 	}
 
-	std::pair<std::string_view, std::string_view> split_once(std::string_view str, std::string_view delimeter)
+	std::optional<std::pair<std::string_view, std::string_view>> split_once(std::string_view str,
+																			std::string_view delimeter)
 	{
 		if (str.empty() || delimeter.empty())
 		{
-			return {str, {}};
+			return std::nullopt;
 		}
 
 		size_t pos = str.find(delimeter);
 		if (pos != std::string_view::npos)
 		{
-			return {str.substr(0, pos), str.substr(pos + delimeter.size())};
+			return std::pair{str.substr(0, pos), str.substr(pos + delimeter.size())};
 		}
-		return {str, {}};
+		return std::nullopt;
 	}
 } // namespace utils
