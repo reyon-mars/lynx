@@ -2,12 +2,14 @@
 #include "http/http_request.hpp"
 #include "http/http_types.hpp"
 #include "utils/string_utils.hpp"
+#include <algorithm>
 #include <cstddef>
 #include <cstring>
 #include <optional>
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 
 namespace http
 {
@@ -54,7 +56,14 @@ namespace http
 			return false;
 		}
 
-		current_request_.set_method(std::string(line.substr(0, s1)));
+		std::string_view method = line.substr(0, s1);
+		if (!is_valid_method(method))
+		{
+			state_ = state::Error;
+			return false;
+		}
+
+		current_request_.set_method(std::string(method));
 		current_request_.set_uri(std::string(line.substr(s1 + 1, s2 - s1 - 1)));
 		current_request_.set_version(std::string(line.substr(s2 + 1)));
 
@@ -89,13 +98,18 @@ namespace http
 				state_ = state::Error;
 				return false;
 			}
-			else
+
+			auto content_length = parsed.value();
+
+			if (content_length < 0)
 			{
-				auto content_length = parsed.value();
-				content_length_ = static_cast<size_t>(content_length);
-				state_ = content_length > 0 ? state::Body : state::Done;
-				return true;
+				state_ = state::Error;
+				return false;
 			}
+
+			content_length_ = static_cast<size_t>(content_length);
+			state_ = content_length > 0 ? state::Body : state::Done;
+			return true;
 		}
 
 		auto result = utils::split_once(line, ":");
@@ -141,6 +155,12 @@ namespace http
 
 	http_parser::parse_result http_parser::feed(std::span<const std::byte> data)
 	{
+		if (data.size() > MAX_HEADER_SIZE)
+		{
+			state_ = state::Error;
+			return parse_result::error;
+		}
+
 		if (buffer_.capacity() < (data.size() + buffer_.size()))
 		{
 			buffer_.reserve(std::max((data.size() + buffer_.size()), buffer_.capacity() * 2));
