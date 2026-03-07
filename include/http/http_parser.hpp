@@ -35,7 +35,6 @@ namespace http
 		state state_ = state::Request_line;
 
 		size_t content_length_ = 0;
-		size_t body_received_ = 0;
 
 		void compact_buffer();
 		std::string_view unparsed_view() const;
