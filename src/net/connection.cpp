@@ -1,6 +1,8 @@
 #include "http/http_parser.hpp"
 #include "http/http_response.hpp"
-#include "net/net_except.hpp"
+#include "http/request_context.hpp"
+#include "http/router.hpp"
+#include "http/uri_parser.hpp"
 #include "net/socket.hpp"
 #include "utils/logger.hpp"
 #include "utils/string_utils.hpp"
@@ -11,10 +13,9 @@
 #include <string>
 #include <string_view>
 #include <sys/_types/_ssize_t.h>
-#include <utility>
 namespace net
 {
-	void handle_http_client(Socket&& client) noexcept
+	void handle_http_client(Socket&& client, http::router& router_) noexcept
 	{
 		try
 		{
@@ -29,6 +30,7 @@ namespace net
 				while ((bytes_received = client.receive(std::span(buffer))) > 0)
 				{
 					std::span<const std::byte> data(buffer.data(), static_cast<size_t>(bytes_received));
+					utils::logger::log("Received " + std::to_string(bytes_received) + " bytes");
 					auto result = parser.feed(data);
 
 					if (result == http::http_parser::parse_result::complete)
@@ -38,6 +40,9 @@ namespace net
 					if (result == http::http_parser::parse_result::error)
 					{
 						utils::logger::log_err("HTTP Protocol Error.");
+						http::http_response err_response{};
+						err_response.set_status(400);
+						client.send(err_response.serialize());
 						return;
 					}
 				}
@@ -50,14 +55,22 @@ namespace net
 				}
 
 				auto& request = *request_opt;
-				http::http_response response;
-				response.set_status(200);
 
-				std::string body = "Method: " + request.method() + "\n" + "URI: " + request.uri() + "\n";
+				http::parsed_uri uri_info = http::parse_uri(request.uri());
+				auto matched = router_.match(request.method(), uri_info.path);
 
-				response.set_header("Content-Type", "text/plain");
-				response.set_header("Content-Length", std::to_string(body.size()));
-				response.set_body(std::move(body));
+				http::http_response response{};
+
+				if (matched)
+				{
+					http::request_context ctx{request, matched->params, uri_info};
+					response = (*(matched.value().handler))(ctx);
+				}
+				else
+				{
+					response.set_status(404);
+					response.set_body("Not Found: " + request.uri());
+				}
 
 				auto connection_header = request.get_header("Connection");
 				if (connection_header && utils::equals_insensitive(utils::trim(*connection_header), "Close"))
