@@ -1,7 +1,6 @@
 #pragma once
-
-#include "http/http_request.hpp"
 #include "http/http_response.hpp"
+#include "http/request_context.hpp"
 #include "utils/function.hpp"
 #include <map>
 #include <optional>
@@ -13,11 +12,11 @@ namespace http
 	class router
 	{
 	public:
-		using handler_function = utils::function<http::http_response(http::http_request&)>;
+		using handler_function = utils::function<http::http_response(const request_context&)>;
 
 		struct matched_route
 		{
-			handler_function handler;
+			const handler_function* handler;
 			std::map<std::string, std::string> params;
 		};
 
