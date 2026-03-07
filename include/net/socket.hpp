@@ -3,7 +3,9 @@
 #include "net/socket_config.hpp"
 #include "net/socket_type.hpp"
 #include <arpa/inet.h>
+#include <cstddef>
 #include <span>
+#include <sys/_types/_ssize_t.h>
 #include <sys/socket.h>
 
 namespace net
