@@ -2,6 +2,7 @@
 #include "http/http_types.hpp"
 #include <cstddef>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -27,6 +28,7 @@ namespace http
 		bool has_header(std::string_view name) const;
 
 		void set_body(std::string_view body);
+		void set_body(std::span<const std::byte> body);
 		void set_body(std::vector<std::byte> body);
 
 		const std::string& method() const;
