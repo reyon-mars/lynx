@@ -77,10 +77,25 @@ namespace http
 		parsed_offset_ += (end + CRLF.size());
 		if (line.empty())
 		{
-			auto content_length = *utils::to_int(utils::trim(*current_request_.get_header("Content-Length")));
-			state_ = content_length > 0 ? state::Body : state::Done;
-			content_length_ = static_cast<size_t>(content_length);
-			return true;
+			auto header = current_request_.get_header("Content-Length");
+			if (!header)
+			{
+				state_ = state::Done;
+				return true;
+			}
+			auto parsed = utils::to_int(utils::trim(header.value()));
+			if (!parsed)
+			{
+				state_ = state::Error;
+				return false;
+			}
+			else
+			{
+				auto content_length = parsed.value();
+				content_length_ = static_cast<size_t>(content_length);
+				state_ = content_length > 0 ? state::Body : state::Done;
+				return true;
+			}
 		}
 
 		auto result = utils::split_once(line, ":");
