@@ -14,7 +14,7 @@ namespace utils
 	{
 		auto now = std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
 		{
-			std::lock_guard<std::mutex> lock(log_mtx_);
+			std::scoped_lock<std::mutex> lock(log_mtx_);
 			std::cout
 				<< std::format("[{:%F %T}] {} {:<5}{} {}\n", now, log_color, log_level, ui::color::reset, log_msg);
 		}
