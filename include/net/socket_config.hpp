@@ -8,6 +8,6 @@ namespace net
 		Domain domain{Domain::IPv4};
 		Type typ{Type::Sstream};
 		Protocol proto{Protocol::Default};
-		socket_address sock_addr{"0.0.0.0", 8080};
+		socket_address sock_addr{.ip = "0.0.0.0", .port = 8080};
 	};
 } // namespace net
