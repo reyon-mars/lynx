@@ -1,5 +1,6 @@
 #include "ui/input_handler.hpp"
 #include <iostream>
+#include <limits>
 
 namespace ui
 {

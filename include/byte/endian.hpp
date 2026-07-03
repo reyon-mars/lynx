@@ -6,7 +6,7 @@
 
 namespace byte
 {
-	enum class byte_order
+	enum class byte_order : std::uint8_t
 	{
 		little,
 		big

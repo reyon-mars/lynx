@@ -1,7 +1,8 @@
 #include "net/socket_address.hpp"
 #include "net/net_except.hpp"
+#include <arpa/inet.h>
 #include <netinet/in.h>
-#include <sys/_endian.h>
+#include <string>
 #include <sys/socket.h>
 
 namespace net
@@ -28,7 +29,6 @@ namespace net
 	}
 
 	bool is_valid_ipv4(const std::string& ip)
-
 	{
 		sockaddr_in addr{};
 		return inet_pton(AF_INET, ip.c_str(), &addr.sin_addr.s_addr) == 1;

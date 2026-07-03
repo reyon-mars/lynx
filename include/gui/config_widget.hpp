@@ -1,9 +1,9 @@
 #pragma once
-#include "net/socket_config.hpp"
 #include <QComboBox>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QWidget>
+#include "net/socket_config.hpp"
 
 namespace gui
 {
