@@ -70,6 +70,8 @@ namespace net
 				{
 					response.set_status(404);
 					response.set_body("Not Found: " + request.uri());
+					utils::logger::log_err(std::to_string(response.status_code()) +
+										   std::string(response.reason_phrase()));
 				}
 
 				auto connection_header = request.get_header("Connection");
