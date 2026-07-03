@@ -10,13 +10,13 @@ namespace utils
 	template <typename>
 	class function;
 
-	template <typename R, typename... Args>
-	class function<R(Args...)>
+	template <typename ReturnType, typename... Args>
+	class function<ReturnType(Args...)>
 	{
 	private:
 		struct callable_base
 		{
-			virtual R invoke(Args... args) = 0;
+			virtual ReturnType invoke(Args... args) = 0;
 			virtual callable_base* clone() const = 0;
 			virtual ~callable_base() = default;
 		};
@@ -31,7 +31,7 @@ namespace utils
 			{
 			}
 
-			R invoke(Args... args) override
+			ReturnType invoke(Args... args) override
 			{
 				return m_callable_(std::forward<Args>(args)...);
 			}
@@ -53,7 +53,7 @@ namespace utils
 			{
 			}
 
-			R invoke(Args... args) override
+			ReturnType invoke(Args... args) override
 			{
 				return m_callable_(std::forward<Args>(args)...);
 			}
@@ -70,7 +70,7 @@ namespace utils
 		function() noexcept = default;
 
 		template <typename T>
-			requires(!std::same_as<std::decay_t<T>, function> && std::is_invocable_r_v<R, T, Args...>)
+			requires(!std::same_as<std::decay_t<T>, function> && std::is_invocable_r_v<ReturnType, T, Args...>)
 		function(T&& f) : m_callable(new callable_impl<std::decay_t<T>>(std::forward<T>(f)))
 		{
 		}
@@ -127,7 +127,7 @@ namespace utils
 			return *this;
 		}
 
-		R operator()(Args... args) const
+		ReturnType operator()(Args... args) const
 		{
 			if (!m_callable)
 			{
