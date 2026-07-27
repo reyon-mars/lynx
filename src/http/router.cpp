@@ -14,17 +14,17 @@ namespace http
 
 	std::optional<router::matched_route> router::match(std::string_view method, std::string_view path) const
 	{
-		for (const auto& route : routes_)
+		for (const auto& route_ : routes_)
 		{
-			if (route.method != method)
+			if (route_.method != method)
 			{
 				continue;
 			}
-			match_result result = match_path(route.pattern, path);
+			match_result result = match_path(route_.pattern, path);
 
 			if (result.matched)
 			{
-				return matched_route{&route.handler, std::move(result.params)};
+				return matched_route{&route_.handler, std::move(result.params)};
 			}
 		}
 		return std::nullopt;
