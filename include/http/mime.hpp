@@ -28,7 +28,7 @@ namespace http {
             {".gif",    "image/gif"},
             {".svg",    "image/svg+xml"},
             {".webp",   "image/webp"},
-            {".ico",    "iamge/x-icon"},
+            {".ico",    "image/x-icon"},
             
             // Audio
             {".mp3",    "audio/mpeg"},
