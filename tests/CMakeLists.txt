@@ -15,6 +15,7 @@ add_executable(unit_tests
     http/test_uri_parser.cpp
     http/test_router.cpp
     net/test_socket.cpp
+    http/test_mime.cpp
 )
 
 target_link_libraries(unit_tests PRIVATE core Catch2::Catch2WithMain)
