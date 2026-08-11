@@ -49,7 +49,7 @@ namespace http
 
 	match_result match_path(std::string_view pattern, std::string_view path)
 	{
-		match_result result{{}, true};
+		match_result result{.params={}, .matched = true};
 		auto pattern_segments = split_path(pattern);
 		auto path_segments = split_path(path);
 
@@ -79,6 +79,22 @@ namespace http
 			}
 		}
 		return result;
+	}
+
+	std::optional<fs::path> safe_resolve( const fs::path& base_dir, const std::string& uri_path )
+	{
+		fs::path full = base_dir / uri_path;
+		
+		fs::path normalized = full.lexically_normal();
+		
+		auto base_str = base_dir.lexically_normal().string();
+		auto full_str = normalized.string();
+		
+		if( !full_str.starts_with( base_str )  )
+		{
+			return std::nullopt;
+		}
+		return normalized;
 	}
 
 } // namespace http
